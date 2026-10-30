@@ -1,0 +1,15 @@
+**
+!requirements-observability.txt
+!apps/
+!apps/payments-mcp/
+!apps/payments-mcp/**
+!packages/
+!packages/python/
+!packages/python/**
+**/.env*
+**/__pycache__
+**/*.db
+**/*.key
+**/*.pem
+**/build
+**/*.egg-info

@@ -1,0 +1,51 @@
+.ws-roommate-legend {
+  position: relative;
+  align-self: flex-start;
+  max-width: 100%;
+  pointer-events: auto;
+  padding: 8px 12px;
+  background: var(--ui-warning-soft);
+  color: var(--ui-warning);
+  border: 1px solid var(--ui-warning);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.ws-roommate-legend label,
+.ws-roommate-legend small {
+  display: block;
+  margin-top: 6px;
+}
+.ws-roommate-legend input {
+  width: auto;
+}
+.ws-top .search-scope-legend {
+  position: static;
+}
+.ws-roommate-badge {
+  padding: 10px;
+  background: var(--ui-warning-soft);
+  color: var(--ui-warning);
+  border: 1px solid var(--ui-warning);
+  border-radius: 8px;
+  margin: 10px 0;
+}
+.ws-roommate-badge p {
+  margin: 6px 0;
+}
+.ws-roommate-badge a {
+  text-decoration: underline;
+}
+.ws-roommate-contact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  text-align: center;
+}
+.ws-roommate-contact svg {
+  flex-shrink: 0;
+}
+.ws-roommate-actions {
+  flex-wrap: wrap;
+}

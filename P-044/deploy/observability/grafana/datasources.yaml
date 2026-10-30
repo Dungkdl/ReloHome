@@ -1,0 +1,69 @@
+apiVersion: 1
+# One store each; dashboards and alerts filter by the deployment_environment_name label.
+datasources:
+- name: Cortex
+  uid: cortex
+  type: prometheus
+  access: proxy
+  url: http://cortex:9009/prometheus
+  isDefault: true
+  editable: false
+  jsonData:
+    httpMethod: POST
+- name: Loki
+  uid: loki
+  type: loki
+  access: proxy
+  url: http://loki:3100
+  editable: false
+  jsonData:
+    derivedFields:
+    - name: Tempo trace
+      matcherType: label
+      matcherRegex: trace_id
+      datasourceUid: tempo
+      url: '$${__value.raw}'
+      urlDisplayLabel: Open infrastructure trace in Tempo
+    - name: Langfuse trace
+      matcherType: label
+      matcherRegex: trace_id
+      url: ${LANGFUSE_URL}/project/relohome/traces/$${__value.raw}
+      urlDisplayLabel: Open trace in Langfuse
+- name: Tempo
+  uid: tempo
+  type: tempo
+  access: proxy
+  url: http://tempo:3200
+  editable: false
+  jsonData:
+    tracesToLogsV2:
+      datasourceUid: loki
+      spanStartTimeShift: '-5m'
+      spanEndTimeShift: '5m'
+      tags: [{key: service.name, value: service_name}]
+      customQuery: true
+      query: '{$${__tags}} | trace_id = "$${__span.traceId}"'
+  correlations:
+  - label: Open agent trace in Langfuse
+    description: Only traces containing agent or LLM observations exist in Langfuse.
+    type: external
+    config:
+      field: traceID
+      target:
+        url: '${LANGFUSE_URL}/project/relohome/traces/$${traceID}'
+- name: ClickHouse
+  uid: clickhouse
+  type: grafana-clickhouse-datasource
+  access: proxy
+  editable: false
+  jsonData:
+    host: clickhouse
+    port: 9000
+    protocol: native
+    username: grafana_reader
+    defaultDatabase: default
+    secure: false
+    dialTimeout: 10
+    queryTimeout: 60
+  secureJsonData:
+    password: $GRAFANA_CLICKHOUSE_PASSWORD

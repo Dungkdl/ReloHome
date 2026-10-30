@@ -1,0 +1,166 @@
+name: Moving containers
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      verify_staging:
+        description: Run real AhaMove staging checks using the protected moving-staging environment
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  changes:
+    name: Detect moving changes
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+    outputs:
+      validate: ${{ steps.paths.outputs.validate }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify runner tools
+        run: bash scripts/check-ci-runner.sh
+      - name: Detect changed paths
+        id: paths
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ "$EVENT" = workflow_dispatch ] || ! git cat-file -e "$BASE_SHA" 2>/dev/null; then
+            echo 'validate=true' >> "$GITHUB_OUTPUT"
+          else
+            validate=false
+            while IFS= read -r path; do
+              case "$path" in
+                *.md) continue ;;
+                'package.json'|'package-lock.json'|'scripts/docker-npm.mjs'|'tsconfig.base.json'|'packages/contracts/'*|'packages/mcp-core/'*|'packages/moving-service/'*|'apps/moving-api/'*|'apps/moving-mcp/'*|'deploy/moving/'*|'deploy/database/moving/'*|'deploy/database/migrations/008_moving_service.sql'|'scripts/relohome/'*|'.github/workflows/moving-containers.yml'|'scripts/check-ci-runner.sh') validate=true ;;
+              esac
+            done < <(git diff --name-only "$BASE_SHA" HEAD)
+            echo "validate=$validate" >> "$GITHUB_OUTPUT"
+          fi
+
+  validate:
+    name: Validate moving services
+    needs: changes
+    if: needs.changes.outputs.validate == 'true'
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+    env:
+      COMPOSE_PROJECT_NAME: moving-validate-${{ github.run_id }}-${{ github.run_attempt }}
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify runner tools
+        working-directory: .
+        run: bash scripts/check-ci-runner.sh node docker compose
+      - name: Build and test moving workspaces
+        working-directory: .
+        run: npm ci && npm run build:ts && npm run test:ci
+      - name: Validate scripts and Compose
+        shell: bash
+        run: |
+          node --check scripts/relohome/moving-stack.mjs
+          node --check scripts/relohome/test-moving-native.mjs
+          node --check scripts/relohome/verify-moving-deployment.mjs
+          bash -n scripts/relohome/verify-moving-ci.sh
+          export MOVING_DB_ADMIN_PASSWORD=$(openssl rand -hex 32)
+          export MOVING_DB_APP_PASSWORD=$(openssl rand -hex 32)
+          export MOVING_MCP_AUTH_TOKEN=$(openssl rand -hex 32)
+          export MOVING_MCP_WRITE_TOKEN=$(openssl rand -hex 32)
+          export MOVING_APPROVAL_TOKEN=$(openssl rand -hex 32)
+          export AHAMOVE_WEBHOOK_SECRET=$(openssl rand -hex 32)
+          docker compose --env-file /dev/null -f deploy/moving/compose.moving.yaml config --quiet
+          docker compose --env-file /dev/null -f deploy/moving/compose.moving.yaml -f deploy/moving/compose.moving.ci.yaml config --quiet
+          docker compose --env-file /dev/null -f deploy/moving/compose.moving.yaml -f deploy/moving/compose.moving.staging-write.yaml config --quiet
+          bash scripts/relohome/verify-moving-ci.sh --check-imports
+      - name: Clean up verifier
+        if: always()
+        run: docker rm -fv "$COMPOSE_PROJECT_NAME-verify" 2>/dev/null || true
+
+  live-staging:
+    name: Verify moving staging
+    needs: [changes, validate]
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_staging
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+    environment: moving-staging
+    defaults:
+      run:
+        working-directory: .
+    env:
+      COMPOSE_PROJECT_NAME: moving-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      AHAMOVE_API_KEY: ${{ secrets.AHAMOVE_API_KEY }}
+      AHAMOVE_MOBILE: ${{ secrets.AHAMOVE_MOBILE }}
+      RELEASE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify runner tools
+        working-directory: .
+        run: bash scripts/check-ci-runner.sh node docker compose
+      - name: Prepare staging credentials
+        shell: bash
+        run: |
+          test -n "$AHAMOVE_API_KEY" && test -n "$AHAMOVE_MOBILE"
+          for name in MOVING_DB_ADMIN_PASSWORD MOVING_DB_APP_PASSWORD MOVING_MCP_AUTH_TOKEN AHAMOVE_WEBHOOK_SECRET; do
+            value=$(openssl rand -hex 32)
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Build TypeScript workspaces
+        working-directory: .
+        run: npm ci && npm run build:ts
+      - name: Start staging containers
+        run: docker compose --env-file /dev/null -f deploy/moving/compose.moving.yaml -f deploy/moving/compose.moving.ci.yaml up --build -d --wait --wait-timeout 180
+      - name: Verify containers and staging API
+        shell: bash
+        run: bash scripts/relohome/verify-moving-ci.sh
+      - name: Collect diagnostics before cleanup
+        if: always()
+        run: docker compose --env-file /dev/null -f deploy/moving/compose.moving.yaml -f deploy/moving/compose.moving.ci.yaml logs --no-color --tail 100
+      - name: Clean up staging stack
+        if: always()
+        run: |
+          docker rm -fv "$COMPOSE_PROJECT_NAME-verify" 2>/dev/null || true
+          docker compose --env-file /dev/null -f deploy/moving/compose.moving.yaml -f deploy/moving/compose.moving.ci.yaml down --volumes --remove-orphans
+      - name: Clean up staging images
+        if: always()
+        run: docker image rm "$COMPOSE_PROJECT_NAME-moving-mcp:ci" "$COMPOSE_PROJECT_NAME-moving-api:ci" "$COMPOSE_PROJECT_NAME-moving-migrate:ci" || true
+
+  gate:
+    name: Moving container gate
+    if: always()
+    needs: [changes, validate, live-staging]
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+    steps:
+      - name: Check all requested work completed
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          VALIDATION_NEEDED: ${{ needs.changes.outputs.validate }}
+          VALIDATION: ${{ needs.validate.result }}
+          LIVE: ${{ needs.live-staging.result }}
+        run: |
+          test "$CHANGES" = success
+          if [ "$VALIDATION_NEEDED" = true ]; then test "$VALIDATION" = success; fi
+          test "$LIVE" != failure && test "$LIVE" != cancelled

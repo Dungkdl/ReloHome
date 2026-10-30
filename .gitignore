@@ -1,0 +1,17 @@
+# LaTeX intermediate files; keep the final PDF.
+*.aux
+*.log
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.xdv
+
+# Local credentials and dependencies.
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+node_modules/
+.venv/
+__pycache__/

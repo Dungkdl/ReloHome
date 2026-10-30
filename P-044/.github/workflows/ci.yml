@@ -1,0 +1,208 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  select-images:
+    name: Select image builds
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      count: ${{ steps.select.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Select affected PR images or the full release
+        id: select
+        run: python scripts/select-ci-images.py
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
+  lint-and-test:
+    name: Lint and test
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+
+    services:
+      roommate-postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: roommate_test
+          POSTGRES_PASSWORD: roommate-ci-test-only
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Set up Node.js for deployment selector tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Create job-local Python environment
+        run: bash scripts/setup-ci-python.sh
+
+      - name: Verify runner tools
+        run: bash scripts/check-ci-runner.sh python node
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint with ruff
+        run: npm run lint:python
+
+      - name: Run tests
+        run: npm run test:python
+        env:
+          APP_ENV: test
+          OPENAI_API_KEY: test-key
+          ROOMMATE_TEST_DATABASE_URL: postgresql://postgres:roommate-ci-test-only@127.0.0.1:${{ job.services['roommate-postgres'].ports[5432] }}/roommate_test
+
+      - name: Clean up Python environment
+        if: always()
+        run: if [ -n "${CI_PYTHON_VENV:-}" ]; then rm -rf "$CI_PYTHON_VENV"; fi
+
+  mcp-images:
+    name: Build and smoke test MCP containers
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+    env:
+      MCP_IMAGE_TAG: ci-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify runner tools
+        run: bash scripts/check-ci-runner.sh docker mcp
+
+      - name: Build MCP images
+        run: make mcp-build
+
+      - name: Smoke test MCP containers
+        run: bash scripts/smoke-mcp-containers.sh
+
+      - name: Clean up containers and images
+        if: always()
+        run: |
+          # Fallback if cancellation interrupted the smoke script's EXIT trap.
+          docker ps -aq --filter "label=lifeflow.ci.mcp=$MCP_IMAGE_TAG" | xargs -r docker rm -fv
+          for project in apps/*-mcp/pyproject.toml; do
+            dockerfile="${project%/pyproject.toml}/Dockerfile"
+            server=$(basename "$(dirname "$dockerfile")" -mcp)
+            docker image rm "$server-mcp:$MCP_IMAGE_TAG" || true
+          done
+
+  lifeflow-typescript:
+    name: Build and test TypeScript
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify runner tools
+        working-directory: .
+        run: bash scripts/check-ci-runner.sh node
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript workspaces
+        env:
+          # Bound compiler heap on container runners instead of inheriting the host-sized default.
+          NODE_OPTIONS: --max-old-space-size=512
+        run: |
+          node -e 'console.log("Node heap limit MiB:", require("node:v8").getHeapStatistics().heap_size_limit / 1024 / 1024)'
+          for memory_file in /sys/fs/cgroup/memory.max /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.events /sys/fs/cgroup/memory/memory.limit_in_bytes; do
+            if [ -r "$memory_file" ]; then
+              printf '%s: ' "$memory_file"
+              cat "$memory_file"
+            fi
+          done
+          npm run build
+
+      - name: Lint TypeScript
+        run: npm run lint:ts
+
+      - name: Run portable workspace tests
+        env:
+          NODE_OPTIONS: --max-old-space-size=512
+        run: npm run test:ci
+
+  application-images:
+    name: Application images
+    needs: [select-images, lint-and-test, mcp-images, lifeflow-typescript]
+    if: needs.select-images.outputs.count != '0'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-application-images.yml
+    with:
+      matrix: ${{ needs.select-images.outputs.matrix }}
+      publish: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+
+  gate:
+    name: CI results
+    if: always()
+    needs: [select-images, lint-and-test, mcp-images, lifeflow-typescript, application-images]
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 5
+    steps:
+      - name: Check validation and requested image builds
+        run: |
+          test "$SELECTION" = success
+          test "$PYTHON" = success
+          test "$MCP" = success
+          test "$TYPESCRIPT" = success
+          if [ "$IMAGE_COUNT" = 0 ]; then
+            test "$EVENT" = pull_request
+            test "$IMAGES" = skipped
+          else
+            [[ "$IMAGE_COUNT" =~ ^[1-9][0-9]*$ ]] || exit 1
+            test "$IMAGES" = success
+          fi
+        env:
+          SELECTION: ${{ needs.select-images.result }}
+          PYTHON: ${{ needs.lint-and-test.result }}
+          MCP: ${{ needs.mcp-images.result }}
+          TYPESCRIPT: ${{ needs.lifeflow-typescript.result }}
+          IMAGES: ${{ needs.application-images.result }}
+          IMAGE_COUNT: ${{ needs.select-images.outputs.count }}
+          EVENT: ${{ github.event_name }}

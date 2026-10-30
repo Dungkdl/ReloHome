@@ -1,0 +1,682 @@
+/* Shared visual system; palette lives in ui/tokens.css. */
+@import "./ui/hero.css";
+
+/* Shared controls and surface hierarchy. No paint values outside the token source. */
+body, .app-shell, .main-shell, .chat-page:not(.map-mode) {
+  background: var(--ui-bg);
+}
+:root[data-theme] :is(.chat-header, .surface, .dialog, .ws-list, .svc-main, .plan-peek-panel) {
+  background: var(--ui-surface);
+  box-shadow: var(--shadow-card);
+}
+:root[data-theme] :is(.dialog, .plan-peek-panel) {
+  border-radius: var(--radius-dialog);
+  box-shadow: var(--shadow-overlay);
+}
+:root[data-theme] :is(.primary, .send-button, .ws-select, .ws-select-small, .ws-chat-show) {
+  background: var(--ui-accent-strong);
+  border-color: var(--ui-accent-strong);
+  color: var(--ui-on-accent);
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+}
+:root[data-theme] :is(.primary, .send-button, .ws-select, .ws-select-small, .ws-chat-show):hover:not(:disabled) {
+  background: var(--ui-accent-hover);
+  border-color: var(--ui-accent-hover);
+  color: var(--ui-on-accent);
+}
+:root[data-theme] :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--service-color, var(--focus-ring));
+  outline-offset: 3px;
+}
+:root[data-theme] :is(.secondary, .icon-button.outlined, .account-chip, .ws-pill-button) {
+  border-color: var(--ui-control-line);
+  background: var(--ui-surface);
+  border-radius: var(--radius-control);
+}
+:root[data-theme] :is(.secondary, .ws-pill-button):hover:not(:disabled) {
+  border-color: var(--service-color);
+  background: var(--service-soft);
+  color: var(--service-color);
+}
+:root[data-theme] button:disabled {
+  opacity: 1;
+  color: var(--ui-muted);
+  background: var(--ui-soft);
+  box-shadow: none;
+  border-color: var(--ui-line);
+}
+:root[data-theme] .primary.danger:not(:disabled),
+:root[data-theme] .primary.danger:hover:not(:disabled) {
+  color: var(--ui-on-accent);
+  background: var(--ui-danger);
+  border-color: var(--ui-danger);
+}
+:root[data-theme] .ws-filterbar .ws-back-chat {
+  background: var(--ui-accent-strong);
+  color: var(--ui-on-accent);
+  border-color: var(--ui-accent-strong);
+}
+:root[data-theme] .guides-filters button[aria-pressed="true"] {
+  color: var(--ui-on-accent);
+  background: var(--service-guide);
+  border-color: var(--service-guide);
+}
+:root[data-theme] :is(.service-icon, .request-symbol, .plan-peek-service, .plan-step-icon) {
+  color: var(--service-color);
+  background: var(--service-soft);
+  border-radius: var(--radius-control);
+}
+:is(.svc-workspace, .moving-booking, .rm-workspace, .ll-workspace, .service-request, .guided-service-panel)[data-service] {
+  --ui-accent: var(--service-color);
+  --ui-accent-strong: var(--service-color);
+  --ui-accent-soft: var(--service-soft);
+  --ui-accent-hover: var(--service-color);
+  --focus-ring: var(--service-color);
+}
+
+/* Welcome: clear, generously sized entry points alongside the existing chat. */
+.chat-header { border-bottom-color: var(--ui-line); }
+.chat-home-link { width: 48px; height: 48px; font-size: 16px; background: var(--ui-accent-soft); color: var(--ui-accent); }
+.chat-header .chat-brand .chat-title { font-size: 23px; font-weight: 750; letter-spacing: -.035em; line-height: 1.25; color: var(--ui-text); }
+.landing-upgrade .landing-brand { font-size: 28px; }
+@media (max-width: 767px) {
+  .chat-header .chat-brand .chat-title { font-size: 20px; }
+  .landing-upgrade .landing-brand { font-size: 21px; }
+  .chat-home-link { width: 44px; height: 44px; }
+}
+:root[data-theme="dark"] .maplibregl-ctrl-attrib {
+  background: var(--ui-surface);
+  color: var(--ui-muted);
+}
+:root[data-theme="dark"] .maplibregl-ctrl-attrib a { color: var(--ui-text); }
+:root[data-theme="dark"] .maplibregl-ctrl-attrib a:hover { color: var(--service-route); }
+.welcome { padding-block: 12px; }
+.welcome h1 { font-size: clamp(30px, 3.4vw, 44px); letter-spacing: -.035em; line-height: 1.18; }
+.welcome-heading .welcome-icon { width: 36px; height: 36px; border-radius: var(--radius-control); }
+.welcome > p { margin-block: 16px 24px; max-width: 660px; }
+.welcome .quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  border: 0;
+  margin-block: 20px 24px;
+}
+.welcome .quick-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 18px;
+  column-gap: 12px;
+  row-gap: 4px;
+  align-content: center;
+  min-height: 108px;
+  padding: 16px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-panel);
+  background: var(--ui-surface);
+  box-shadow: var(--shadow-card);
+  border-left: 3px solid var(--service-color);
+  text-align: left;
+}
+.welcome .quick-card:last-child { border-right: 1px solid var(--ui-line); }
+.welcome .quick-card .service-icon {
+  grid-row: 1 / span 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--service-soft);
+  color: var(--service-color);
+  border-radius: var(--radius-control);
+}
+.welcome .quick-card .service-icon svg { width: 22px; height: 22px; }
+.welcome .quick-card strong { font-size: 15px; align-self: end; }
+.welcome .quick-card > span:not(.service-icon) { font-size: 13px; grid-column: 2; }
+.welcome .quick-card .quick-arrow { position: static; display: block; grid-column: 3; grid-row: 1 / span 2; align-self: center; color: var(--service-color); }
+.welcome .starter > button { border-radius: var(--radius-control); background: var(--ui-surface); }
+.welcome .starter > button:hover { border-color: var(--ui-accent); background: var(--ui-accent-soft); }
+.welcome .quick-card:hover:not(:disabled) {
+  background: var(--service-soft);
+  border-color: var(--service-color);
+  box-shadow: var(--shadow-raised);
+}
+.welcome .quick-card:disabled .service-icon { color: var(--ui-muted); background: var(--ui-soft); }
+
+/* Chat and plan: the response, next action and budget have distinct visual levels. */
+.assistant-bubble:not(.error-bubble) {
+  padding: 20px 24px;
+  border: 1px solid var(--ui-line);
+  border-left: 3px solid var(--ui-accent);
+  border-radius: var(--radius-panel);
+  background: var(--ui-surface);
+  box-shadow: var(--shadow-card);
+}
+.assistant-label { color: var(--ui-accent); font-weight: 700; margin-bottom: 12px; }
+.user-bubble { background: var(--ui-accent-soft); border: 1px solid var(--ui-line); }
+.chat-service-summary { background: var(--ui-soft); border-radius: var(--radius-control); padding: 12px; }
+.chat-service-summary[data-service] { background: var(--service-soft); border-left: 3px solid var(--service-color); }
+.chat-service-summary[data-service] > span { color: var(--service-color); font-weight: 650; }
+.service-journey { gap: 8px; padding-block: 12px; background: var(--ui-bg); }
+.service-journey button[data-service] { border-radius: var(--radius-control); background: var(--ui-surface); border-color: var(--ui-line); border-top: 3px solid var(--service-color); }
+.service-journey button[data-service].active { color: var(--service-color); background: var(--service-soft); border-color: var(--service-color); }
+.map-panel .service-icon, .map-panel .map-toolbar > svg { color: var(--service-route); background: var(--service-route-soft); }
+.composer { border-radius: var(--radius-panel); border-color: var(--ui-control-line); box-shadow: var(--shadow-raised); }
+.composer:focus-within { border-color: var(--ui-accent); outline: 2px solid var(--ui-accent-soft); }
+.plan-peek-header { background: var(--ui-soft); border-bottom-color: var(--ui-line); }
+.plan-peek-target { color: var(--ui-accent); background: var(--ui-accent-soft); }
+.plan-panel-tabs { background: var(--ui-surface); }
+.plan-panel-tabs button[aria-selected="true"] { background: var(--ui-accent-soft); border-bottom-color: var(--ui-accent); }
+.plan-peek-step { border: 1px solid var(--ui-line); border-radius: var(--radius-panel); padding: 16px; margin-block: 12px; background: var(--ui-surface); }
+.plan-peek-service, .plan-step-icon { border: 1px solid color-mix(in srgb, var(--service-color) 28%, var(--ui-line)); }
+.plan-peek-number { color: var(--ui-muted); background: var(--ui-soft); }
+.plan-peek-status { font-weight: 600; border-radius: var(--radius-control); }
+.plan-peek-status.confirmed { color: var(--ui-success); background: var(--ui-success-soft); }
+.plan-peek-status.attention { color: var(--ui-warning); background: var(--ui-warning-soft); }
+.plan-peek-status.waiting, .plan-peek-status.running { color: var(--ui-pending); background: var(--ui-pending-soft); }
+.viewing-choice, .bulk-review-list > li, .bulk-result-list > li { background: var(--ui-surface); border-radius: var(--radius-panel); border: 1px solid var(--ui-line); }
+.bulk-footer { background: var(--ui-surface-raised); border-top-color: var(--ui-line); box-shadow: var(--shadow-card); }
+.viewing-choice:has(input:checked) { background: var(--ui-accent-soft); border-color: var(--ui-accent); }
+/* Related services use the same readable, optional action cards everywhere. */
+.auth-dialog-login { display: block; min-height: 0; padding: 0; background: transparent; }
+.auth-dialog-login .login-story, .auth-dialog-login .login-appearance, .auth-dialog-login .login-foot { display: none; }
+.auth-dialog-login .login-form-wrap { padding: 0; background: transparent; }
+.auth-dialog-login .login-form { width: 100%; max-width: none; }
+.auth-context-note { color: var(--ui-muted); font-size: 13px; margin: 0 0 16px; }
+.guest-signin { min-height: 44px; white-space: nowrap; }
+.composer-error { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+.composer-error > span { flex: 1; min-width: 0; }
+.composer-error .text-button { min-height: 44px; flex: 0 0 auto; }
+.service-suggestions,
+.viewing-preparation {
+  padding: 16px;
+  background: var(--ui-soft);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-panel);
+}
+.service-suggestions { display: grid; gap: 12px; }
+.service-suggestions > span { color: var(--ui-text); font-size: 14px; font-weight: 650; }
+.service-suggestions > div,
+.viewing-preparation-actions,
+.viewing-preparation-optional {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 8px;
+  align-items: stretch;
+}
+:is(.service-suggestions, .viewing-preparation) .service-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid var(--ui-control-line);
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-radius: var(--radius-control);
+  text-align: left;
+  white-space: normal;
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+}
+.service-suggestion-icon {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-control);
+  color: var(--service-color);
+  background: var(--service-soft);
+}
+.service-suggestion-label { flex: 1; font-size: 13px; font-weight: 650; line-height: 1.4; }
+.service-suggestion-arrow { flex: 0 0 16px; color: var(--service-color); }
+:is(.service-suggestions, .viewing-preparation) .service-suggestion:hover:not(:disabled) {
+  border-color: var(--service-color);
+  background: var(--service-soft);
+  color: var(--ui-text);
+  box-shadow: var(--shadow-raised);
+}
+.viewing-preparation { margin-top: 16px; }
+.viewing-preparation-heading { display: flex; align-items: center; gap: 8px; color: var(--ui-accent); }
+.viewing-preparation-heading strong { color: var(--ui-text); font-size: 15px; line-height: 1.4; }
+.viewing-preparation > p { margin: 8px 0 12px; }
+.viewing-preparation-optional { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--ui-line); }
+.viewing-preparation-optional > span { grid-column: 1 / -1; color: var(--ui-muted); font-size: 12px; font-weight: 600; }
+.service-journey .plan-next-step[data-service] .plan-next-button {
+  background: var(--service-soft);
+  color: var(--service-color);
+  border-color: var(--service-color);
+}
+
+/* Interior workspaces: consistent identity, readable result cards and map controls. */
+.ws-list-head, .svc-head { border-bottom: 1px solid var(--ui-line); background: var(--service-soft); }
+.ws-list-head .eyebrow, .svc-head .eyebrow { color: var(--service-color); font-weight: 700; }
+.svc-head .service-icon { width: 48px; height: 48px; border: 1px solid color-mix(in srgb, var(--service-color) 25%, var(--ui-line)); }
+.svc-head h2 { font-size: clamp(23px, 2vw, 30px); }
+.svc-toolbar { background: var(--ui-surface); border-bottom-color: var(--ui-line); }
+.svc-toolbar .ws-pill-button.active { color: var(--service-color); background: var(--service-soft); border-color: var(--service-color); }
+.svc-card { margin: 12px 0; padding: 20px; border: 1px solid var(--ui-line); border-radius: var(--radius-panel); background: var(--ui-surface); box-shadow: var(--shadow-card); }
+.svc-card.chosen { border-color: var(--service-color); background: var(--service-soft); }
+.svc-carrier { color: var(--service-color); }
+.svc-card-end .price { font-size: 24px; color: var(--ui-text); letter-spacing: -.02em; }
+.svc-timeline .svc-line i { background: var(--service-color); }
+.ws-list-body { display: flex; flex-direction: column; gap: 12px; }
+.ws-card {
+  padding: 16px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-panel);
+  background: var(--ui-surface);
+  box-shadow: var(--shadow-card);
+}
+.ws-card:hover, .ws-card.active { border-color: var(--service-color); background: var(--service-soft); }
+.ws-card.chosen { padding-left: 13px; border-left: 4px solid var(--service-color); background: var(--service-soft); }
+.ws-card-photo { border-radius: var(--radius-control); }
+.ws-card-info .price { font-size: 19px; color: var(--service-home); letter-spacing: -.02em; }
+.ws-card-info .title-button { font-weight: 650; }
+.ws-filterbar, .ws-counter, .ws-poi-detail { border-radius: var(--radius-panel); box-shadow: var(--shadow-raised); }
+.ws-filterbar .ws-filter-label { color: var(--service-color); }
+.ws-filterbar select { border-color: var(--ui-control-line); }
+.ws-detail { background: var(--ui-surface); border-radius: var(--radius-panel); box-shadow: var(--shadow-raised); }
+.ws-card-actions .text-button { color: var(--service-color); }
+.request-intro { border-bottom: 1px solid var(--ui-line); padding-bottom: 20px; }
+.request-symbol { border: 1px solid color-mix(in srgb, var(--service-color) 28%, var(--ui-line)); }
+.guided-panel-title { background: var(--ui-soft); border-bottom: 1px solid var(--ui-line); }
+.service-request .request-trip label.selected { color: var(--service-color); border-color: var(--service-color); background: var(--service-soft); }
+.service-request .request-extra { background: var(--ui-soft); border-radius: var(--radius-control); }
+.moving-booking :is(.mv-dot, .mv-steps .active > span) { background: var(--service-moving); color: var(--ui-on-accent); }
+.moving-booking .mv-endpoint { border-radius: var(--radius-panel); background: var(--ui-surface); }
+.moving-booking .mv-endpoint.active { border-color: var(--service-moving); box-shadow: inset 3px 0 var(--service-moving); }
+.moving-booking .mv-section-nav button[aria-current="step"] { color: var(--service-moving); background: var(--service-moving-soft); }
+.moving-booking :is(.mv-selected-home, .mv-service-choice, .mv-vehicle-choices button, .mv-addon, .mv-package) { border-radius: var(--radius-control); }
+.moving-booking :is(.mv-service-choice.selected, .mv-selected-home.selected, .mv-vehicle-choices button.selected) { background: var(--service-moving-soft); border-color: var(--service-moving); }
+.moving-booking .mv-submit { background: var(--service-moving); color: var(--ui-on-accent); border-color: var(--service-moving); }
+.moving-booking .mv-steps { border-bottom-color: var(--ui-line); }
+
+/* Roommate profiles and inbox have their own Rose identity. */
+.rm-page-heading { padding: 24px; border: 1px solid var(--ui-line); border-left: 4px solid var(--service-roommate); border-radius: var(--radius-panel); background: var(--ui-surface); box-shadow: var(--shadow-card); margin-bottom: 24px; }
+.rm-page-heading .rm-kicker { color: var(--service-roommate); }
+.rm-workspace .rm-navigation { padding: 6px; background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-panel); gap: 6px; }
+.rm-workspace .rm-navigation [aria-selected="true"], .rm-workspace .rm-navigation .active { color: var(--service-roommate); background: var(--service-roommate-soft); border-radius: var(--radius-control); }
+.rm-workspace :is(.rm-card, .rm-profile-card, .rm-panel, .rm-filter-panel) { border-radius: var(--radius-panel); box-shadow: var(--shadow-card); border-color: var(--ui-line); background: var(--ui-surface); }
+.rm-workspace :is(.rm-card, .rm-profile-card) { border-top: 3px solid var(--service-roommate); }
+.rm-workspace :is(.rm-avatar, .rm-avatar-fallback) { color: var(--service-roommate); background: var(--service-roommate-soft); }
+.rm-workspace :is(.rm-summary-fact, .rm-profile-fact, .rm-compatibility) { border-color: var(--ui-line); }
+.rm-workspace :is(.rm-source-switch .active, .rm-source-switch [aria-pressed="true"]) { color: var(--service-roommate); border-color: var(--service-roommate); background: var(--service-roommate-soft); }
+
+/* Landlord/Admin: Gold identity, consistent neutral tables, real existing metrics. */
+.ll-workspace { --accent: var(--service-landlord); --accent-soft: var(--service-landlord-soft); --ll-soft: var(--service-landlord-soft); }
+.ll-heading { border-bottom: 1px solid var(--ui-line); margin-bottom: 20px; }
+.ll-kicker, .ll-eyebrow { color: var(--service-landlord); }
+.ll-nav { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-panel); padding: 6px; gap: 4px; }
+.ll-nav button { border-radius: var(--radius-control); }
+.ll-nav button.active { color: var(--service-landlord); background: var(--service-landlord-soft); }
+.ll-nav button.active::after { display: none; }
+.ll-workspace :is(.ll-panel, .ll-metric, .ll-contact-list article, .ll-unit, .ll-listing-table) { border-radius: var(--radius-panel); background: var(--ui-surface); border-color: var(--ui-line); box-shadow: var(--shadow-card); }
+.ll-workspace .ll-metric { border-top: 3px solid var(--service-landlord); color: var(--ui-text); }
+.ll-metric::after { display: none; }
+.ll-workspace .ll-metric > span { color: var(--service-landlord); background: var(--service-landlord-soft); border-radius: var(--radius-control); }
+.ll-workspace .ll-metric strong { font-size: 32px; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
+.ll-signal-grid { background: var(--ui-soft); border-radius: var(--radius-control); }
+.ll-signal-grid strong { color: var(--ui-text); }
+.ll-property-list > button { border-radius: var(--radius-control); background: var(--ui-surface); }
+.ll-property-icon, .ll-contact-avatar { color: var(--service-landlord); background: var(--service-landlord-soft); }
+.ll-listing-table :is(th, thead, .ll-listing-row:first-child) { background: var(--ui-soft); }
+.ll-listing-row { border-color: var(--ui-line); }
+.ll-listing-row:hover { background: var(--ui-soft); }
+.ll-workspace .ll-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-block: 16px; }
+.ll-workspace .ll-filters label { display: flex; flex-direction: row; align-items: center; gap: 8px; flex: 1 1 240px; min-width: 0; }
+.ll-workspace .ll-filters label svg { flex: 0 0 16px; color: var(--ui-muted); }
+.ll-workspace .ll-filters input { width: 100%; min-width: 0; }
+.ll-workspace .ll-filters select { width: auto; max-width: 100%; }
+:root[data-theme] .ll-status { color: var(--ui-pending); background: var(--ui-pending-soft); border-radius: var(--radius-control); }
+:root[data-theme] .ll-status:is(.active, .published, .resolved, .verified) { color: var(--ui-success); background: var(--ui-success-soft); }
+:root[data-theme] .ll-status:is(.pending, .pending_review, .new) { color: var(--ui-warning); background: var(--ui-warning-soft); }
+:root[data-theme] .ll-status:is(.rejected, .revoked, .suspended, .declined) { color: var(--ui-danger); background: var(--ui-danger-soft); }
+.ll-error, .ll-form-error, .ll-unit-actions button.danger { color: var(--ui-danger); }
+.ll-error { background: var(--ui-danger-soft); border-color: var(--ui-danger); }
+.ll-count { color: var(--ui-on-accent); background: var(--ui-accent-strong); }
+
+/* Landing: purposeful section contrast and useful, identifiable service navigation. */
+.landing-page {
+  --landing-bg: var(--ui-bg);
+  --landing-surface: var(--ui-surface);
+  --landing-soft: var(--ui-soft);
+  --landing-line: var(--ui-line);
+  --landing-ink: var(--ui-text);
+  background: var(--ui-bg);
+}
+.landing-header { background: var(--ui-surface); border-bottom-color: var(--ui-line); box-shadow: var(--shadow-card); }
+.landing-nav-cta { background: var(--ui-accent-strong); color: var(--ui-on-accent); border-color: var(--ui-accent-strong); }
+.landing-upgrade .landing-inline-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--ui-accent-strong);
+  border-radius: var(--radius-control);
+  background: var(--ui-accent-strong);
+  color: var(--ui-on-accent);
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+}
+.landing-upgrade .landing-inline-cta:hover { background: var(--ui-accent-hover); border-color: var(--ui-accent-hover); color: var(--ui-on-accent); text-decoration: none; }
+.landing-upgrade .landing-inline-cta:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 4px; }
+.welcome .resume-chat { display: inline-flex; gap: 10px; min-height: 44px; border-color: var(--ui-accent); color: var(--ui-accent); margin-bottom: 4px; }
+.lp-service-index { background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
+.landing-upgrade .lp-service-index > .landing-container { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; padding-block: 16px; }
+.landing-upgrade .lp-service-index a { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; padding: 12px 8px; border-radius: var(--radius-control); text-align: center; color: var(--ui-text); min-height: 88px; font-size: 13px; }
+.landing-upgrade .lp-service-index a svg { color: var(--service-color); width: 22px; height: 22px; }
+.landing-upgrade .lp-service-index a:hover { background: var(--service-soft); color: var(--service-color); }
+.landing-section-heading h2 { color: var(--ui-text); letter-spacing: -.035em; }
+.landing-section-heading h2 em { color: var(--ui-accent); }
+.landing-upgrade :is(.lp-home-feature, .lp-relocation-feature, .lp-profile-preview, .lp-dashboard-preview, .lp-story-preview) { border-radius: var(--radius-dialog); box-shadow: var(--shadow-card); border-color: var(--ui-line); }
+.landing-upgrade .lp-home-feature { border-top: 4px solid var(--service-home); }
+.landing-upgrade .lp-relocation-feature { border-top: 4px solid var(--service-moving); background: var(--ui-surface); }
+.lp-home-preview { background: var(--service-home-soft); }
+.lp-relocation-row .lp-icon-tile { color: var(--service-color); background: var(--service-soft); border-radius: var(--radius-control); }
+.lp-home-feature .lp-eyebrow { color: var(--service-home); }
+.landing-journey, #landlord, .landing-final { --ui-accent: var(--ui-accent-strong); }
+.landing-journey { background: var(--ui-section); border-block: 1px solid var(--ui-section-line); }
+.lp-journey-demo { border-radius: var(--radius-dialog); border: 1px solid var(--ui-line); box-shadow: var(--shadow-raised); background: var(--ui-surface); }
+.lp-journey-tabs button[aria-selected="true"], .lp-journey-tabs .active { background: var(--ui-accent-soft); color: var(--ui-accent); }
+#next .landing-kicker, #next h2 em { color: var(--service-roommate); }
+#next .lp-profile-preview { border-top: 4px solid var(--service-roommate); }
+#next :is(.lp-profile-avatar, .lp-roommate-icon, .lp-icon-tile) { color: var(--service-roommate); background: var(--service-roommate-soft); }
+#landlord { background: var(--ui-section); border-block: 1px solid var(--ui-section-line); }
+#landlord .landing-kicker, #landlord h2 em { color: var(--service-landlord); }
+#landlord .landing-kicker { color: var(--service-landlord-text); }
+#landlord .lp-dashboard-preview { border-top: 4px solid var(--service-landlord); }
+#landlord :is(.lp-icon-tile, .lp-dashboard-mark) { background: var(--service-landlord-soft); color: var(--service-landlord); }
+#guide .landing-kicker, #guide h2 em { color: var(--service-guide); }
+.landing-guide-card, .guides-list article { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-panel); box-shadow: var(--shadow-card); }
+.guides-page { --ui-accent: var(--service-guide); --ui-accent-strong: var(--service-guide); --ui-accent-soft: var(--service-guide-soft); --ui-accent-hover: var(--service-guide); }
+.guides-heading { padding: 32px; border-radius: var(--radius-panel); background: var(--service-guide-soft); border-left: 4px solid var(--service-guide); }
+.guides-list article { border-top: 3px solid var(--service-guide); }
+.guides-list article > svg { background: var(--service-guide-soft); color: var(--service-guide); }
+.landing-final { background: var(--ui-section); border-block: 1px solid var(--ui-section-line); }
+
+@media (hover: hover) {
+  .welcome .quick-card, .guides-list article, .ll-property-list > button, .rm-card, .svc-card { transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease; }
+  .guides-list article:hover, .rm-card:hover { border-color: var(--service-color); box-shadow: var(--shadow-raised); }
+}
+@media (max-width: 1100px) {
+  .welcome .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .landing-upgrade .lp-service-index > .landing-container { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .welcome h1 { font-size: 30px; }
+  .welcome .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .welcome .quick-card { grid-template-columns: minmax(0, 1fr) 18px; padding: 14px; min-height: 112px; gap: 8px; }
+  .welcome .quick-card .service-icon { grid-column: 1; grid-row: 1; width: 38px; height: 38px; }
+  .welcome .quick-card strong { grid-column: 1/-1; grid-row: 2; font-size: 14px; }
+  .welcome .quick-card > span:not(.service-icon) { grid-column: 1/-1; grid-row: 3; font-size: 12px; }
+  .welcome .quick-card .quick-arrow { grid-column: 2; grid-row: 1; }
+  .assistant-bubble:not(.error-bubble) { padding: 16px; }
+  .rm-page-heading { padding: 18px; }
+  .guides-heading { padding: 24px 18px; }
+  .landing-upgrade .lp-service-index > .landing-container { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .landing-upgrade .lp-service-index a { flex-direction: row; justify-content: flex-start; padding: 12px; min-height: 52px; background: var(--service-soft); color: var(--service-color); }
+  .svc-card { padding: 16px; }
+  .ll-workspace .ll-filters > * { width: 100%; }
+  .ll-workspace .ll-filters label { flex-basis: 100%; }
+}
+/* Fit the welcome to the space remaining above the composer, including at
+   browser zoom levels where the viewport alone overestimates that space. */
+.conversation-scroll:has(> .welcome) {
+  container-name: welcome;
+  container-type: size;
+  min-height: 0;
+  padding-block: 8px;
+}
+/* An empty textarea stays one line; the long placeholder must not size it.
+   Typed messages retain the existing content-sized, multiline composer. */
+:root .chat-page:has(.welcome) .composer textarea:placeholder-shown {
+  field-sizing: fixed;
+  height: 44px;
+  min-height: 44px;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .conversation-scroll:has(> .welcome) { padding-block: 6px; }
+}
+@container welcome (max-height: 760px) {
+  .welcome { padding-block: 0; }
+  .welcome h1 { flex-direction: row; flex-wrap: wrap; gap: 0 .3em; font-size: 32px; margin-bottom: 8px; }
+  .welcome > p { max-width: none; margin-block: 8px 12px; }
+  .welcome-heading .welcome-icon { width: 28px; height: 28px; }
+  .welcome-heading { margin-bottom: 8px; }
+  .welcome > p .desktop-only { display: none; }
+  .welcome .quick-grid { margin-block: 12px; gap: 8px; }
+  .welcome .quick-card { min-height: 72px; padding: 10px 12px; }
+  .welcome-note { margin-top: 8px; }
+}
+@container welcome (max-width: 720px) and (max-height: 760px) {
+  .welcome { padding-block: 0; }
+  .welcome h1 { font-size: 24px; margin-bottom: 8px; }
+  .welcome .quick-grid { margin-block: 8px; gap: 8px; }
+  .welcome .quick-card { grid-template-columns: 28px minmax(0, 1fr); min-height: 52px; padding: 8px; column-gap: 8px; row-gap: 0; align-items: center; }
+  .welcome .quick-card .service-icon { grid-column: 1; grid-row: 1; width: 28px; height: 28px; }
+  .welcome .quick-card .service-icon svg { width: 19px; height: 19px; }
+  .welcome .quick-card strong { grid-column: 2; grid-row: 1; align-self: center; padding-right: 0; }
+  .welcome .quick-card > span:not(.service-icon) { display: none; }
+  .welcome .quick-card .quick-arrow { display: none; }
+}
+@container welcome (max-height: 460px) {
+  .welcome-heading { display: none; }
+  .welcome h1 { font-size: 24px; }
+  .welcome > p { display: none; }
+  .welcome .quick-grid { margin-block: 8px; }
+  .welcome-note { margin-top: 4px; }
+}
+@container welcome (max-width: 720px) and (max-height: 460px) {
+  .welcome .quick-card { grid-template-columns: 24px minmax(0, 1fr); min-height: 48px; padding: 6px; column-gap: 6px; }
+  .welcome .quick-card .service-icon { width: 24px; height: 24px; }
+  .welcome .quick-card strong { font-size: 13px; }
+}
+@container welcome (max-width: 720px) and (max-height: 420px) {
+  .welcome h1 { font-size: 22px; margin-bottom: 4px; }
+  .welcome .resume-chat { margin-bottom: 0; }
+  .welcome .starter > .small { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme] :is(button, a, input, select, textarea), .welcome .quick-card, .guides-list article, .ll-property-list > button, .rm-card, .svc-card { transition: none; }
+}
+
+.viewing-review-form { display:grid; gap:18px; }
+.viewing-review-form fieldset { border:1px solid var(--ui-line); border-radius:12px; padding:16px; }
+.viewing-review-form > label { display:grid; gap:8px; }
+.viewing-review-stars { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+.viewing-review-stars label { display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--ui-accent); }
+.viewing-review-stars input { accent-color:var(--ui-accent); }
+
+/* Persistent navigation reserves its own space in every workspace. */
+.header-reveal { position: fixed; inset: 0 0 auto; height: var(--ui-header-height); z-index: 60; }
+:root[data-theme] .header-reveal .chat-header {
+  position: absolute; inset: 0 0 auto; width: 100%;
+  padding-block: 8px;
+  background: var(--tenant-glass);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+.chat-header .chat-brand .chat-title { font-size: 20px; }
+.chat-title > a { color: inherit; text-decoration: none; }
+.chat-title > a:hover { color: var(--ui-accent); }
+.chat-service-summary { width: fit-content; max-width: 100%; }
+.notice-symbol {
+  display: inline-grid; place-items: center; flex: 0 0 20px; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--tenant-alert); color: var(--ui-surface);
+  font-size: 14px; font-weight: 800; font-style: normal;
+}
+.notice-symbol.info { background: var(--ui-info); color: var(--ui-on-accent); }
+.viewing-tone-0 { --viewing-bg: var(--tenant-home-purple); --viewing-soft: var(--tenant-home-purple-soft); --viewing-ink: var(--tenant-home-purple-ink); }
+.viewing-tone-1 { --viewing-bg: var(--tenant-home-blue); --viewing-soft: var(--tenant-home-blue-soft); --viewing-ink: var(--tenant-home-blue-ink); }
+.viewing-tone-2 { --viewing-bg: var(--tenant-home-peach); --viewing-soft: var(--tenant-home-peach-soft); --viewing-ink: var(--tenant-home-peach-ink); }
+.viewing-tone-3 { --viewing-bg: var(--tenant-home-teal); --viewing-soft: var(--tenant-home-teal-soft); --viewing-ink: var(--tenant-home-teal-ink); }
+.viewing-panel .viewing-item, .bulk-review-list > li, .bulk-result-list > li {
+  background: var(--viewing-bg); border-color: var(--ui-line); align-content: start;
+}
+.viewing-item.after-viewing > header { grid-template-columns: minmax(0, 1fr) fit-content(50%); gap: 8px; }
+.viewing-item.after-viewing > header strong { display: block; white-space: nowrap; text-overflow: ellipsis; }
+.viewing-item.after-viewing > header .viewing-status { grid-column: 2; justify-self: end; text-align: right; font-weight: 700; }
+.viewing-item.after-viewing > header .viewing-status:not(:is(.agreed, .pending, .rejected, .confirmed):not(.viewing-landlord)) { color: var(--ui-accent-strong); }
+.viewing-status:not(.viewing-landlord):is(.agreed, .pending, .rejected, .confirmed) {
+  padding: 3px 12px; border: 1.5px solid currentColor; border-radius: 999px; font-size: 12px; font-weight: 700;
+}
+.viewing-status.agreed:not(.viewing-landlord) { color: var(--ui-warning); background: var(--ui-warning-soft); border-color: var(--tenant-warning-line); }
+.viewing-status.pending:not(.viewing-landlord) { color: var(--ui-info); background: var(--ui-info-soft); }
+.viewing-status.rejected:not(.viewing-landlord) { color: var(--ui-danger); background: var(--ui-danger-soft); }
+.viewing-status.confirmed:not(.viewing-landlord) { color: var(--ui-success); background: var(--ui-success-soft); }
+.viewing-item .bulk-card-slot { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--ui-text); }
+/* Before the visit the booked time is the key fact, so it stands out as a pill. */
+.viewing-item:not(.after-viewing) .bulk-card-slot {
+  justify-self: start; width: fit-content; padding: 4px 12px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; color: var(--tenant-slot-text); background: var(--tenant-slot-bg);
+}
+.bulk-slot-fields .bulk-field-error { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--ui-danger); }
+.bulk-slot-fields select[aria-invalid="true"] { border: 2px solid var(--ui-danger); }
+.bulk-review-list li > b { width: fit-content; padding: 5px 9px; border-radius: 6px; background: var(--tenant-slot-bg); color: var(--tenant-slot-text); font-weight: 750; }
+.viewing-item .agreement { padding: 12px; background: var(--viewing-soft); border: 1px solid var(--viewing-ink); border-radius: 8px; }
+.viewing-payment-due { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--tenant-warning-line); font-weight: 700; }
+.viewing-payment-report { border: 2px solid var(--viewing-ink); background: color-mix(in srgb, var(--viewing-ink) 9%, var(--viewing-bg)); padding: 12px 16px; border-radius: 8px; }
+.viewing-payment-report p { margin: 0 0 6px; }
+.viewing-payment-report.rejected {
+  position: relative; padding-left: 48px; font-weight: 600;
+  background: color-mix(in srgb, var(--ui-danger) 10%, var(--ui-surface)); border-color: var(--ui-danger); color: var(--ui-danger);
+}
+.viewing-payment-report.rejected > .notice-symbol { position: absolute; left: 14px; top: 12px; width: 24px; height: 24px; }
+.viewing-landlord-note {
+  margin: 10px 0 0; padding: 8px 12px; border: 1px solid var(--ui-danger); border-left-width: 4px; border-radius: 10px;
+  background: var(--ui-surface);
+}
+.viewing-landlord-note strong { display: block; font-size: 11px; margin-bottom: 2px; color: var(--ui-danger); }
+.viewing-landlord-note p { margin: 0; font-style: italic; font-weight: 500; color: var(--ui-text); }
+.viewing-item .viewing-preparation { background: var(--viewing-soft); border-color: var(--viewing-ink); }
+.viewing-preparation.settled { border-style: dashed; }
+.viewing-item .viewing-preparation :is(.service-suggestion, .service-suggestion-icon) { background: var(--viewing-soft); border-color: var(--viewing-ink); color: var(--viewing-ink); }
+.viewing-item .viewing-preparation :is(.service-suggestion-arrow, .viewing-preparation-heading, .viewing-preparation-optional > span) { color: var(--viewing-ink); }
+.viewing-item .viewing-preparation-optional { border-color: var(--viewing-ink); }
+.viewing-suggestion-label { margin-left: auto; padding: 2px 10px; border-radius: 999px; color: var(--ui-surface); background: var(--viewing-ink); font-size: 11px; font-weight: 700; letter-spacing: .02em; flex-shrink: 0; }
+.viewing-item .agreement .form-actions { display: flex; gap: 8px; }
+.viewing-item .agreement .form-actions button { flex: 1; min-height: 44px; }
+.viewing-item .agreement .secondary { background: var(--ui-surface); color: var(--ui-accent-strong); border-color: var(--ui-accent-strong); }
+.review-locked { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border: 1px solid var(--tenant-warning-line); }
+.account-page .account-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.account-page .account-grid > .surface { min-width: 0; padding: 24px; border: 1px solid var(--ui-line); border-radius: var(--radius-panel); background: var(--ui-surface); }
+.account-security h3 { display: flex; align-items: center; gap: 8px; }
+.account-page .account-preferences { grid-template-columns: minmax(0, 1fr); }
+.account-preferences .form-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.request-history-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--ui-line); border-radius: var(--radius-panel); overflow: hidden; }
+.request-history-list .request-history-card { border: 0; border-bottom: 1px solid var(--ui-line); border-radius: 0; box-shadow: none; }
+.request-history-card:not(:nth-child(3n)) { border-right: 1px solid var(--ui-line); }
+@media (min-width: 621px) and (max-width: 1100px) {
+  .request-history-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .request-history-card:not(:nth-child(3n)) { border-right: 0; }
+  .request-history-card:nth-child(odd) { border-right: 1px solid var(--ui-line); }
+}
+.saved-grid .housing-card { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-panel); padding: 16px; gap: 12px; }
+.contact-thread-seen { display: block; font-size: 11px; text-align: right; color: var(--ui-muted); padding-top: 4px; }
+.contact-request-status { margin: 0; color: var(--ui-muted); font-size: 12px; }
+.map-workspace[data-service="property"] .ws-list { background: var(--tenant-map-bg); border-color: var(--tenant-map-line); }
+.map-workspace[data-service="property"] .ws-list .ws-list-head { background: var(--tenant-map-selected); border-color: var(--tenant-map-line); }
+.map-workspace[data-service="property"] .ws-list .ws-card { background: var(--tenant-map-card); border-color: var(--tenant-map-line); }
+.map-workspace[data-service="property"] .ws-list .ws-card { border-width: 1.5px; }
+.map-workspace[data-service="property"] .ws-list .ws-card:is(.active, .chosen) { background: var(--tenant-map-selected); border: 2px solid var(--tenant-map-ink); }
+.map-workspace[data-service="property"] .ws-list .price, .map-workspace[data-service="property"] .ws-list .ws-list-head h3 { color: var(--tenant-map-ink); }
+.map-workspace[data-service="property"] .ws-list .ws-select-small, .map-workspace[data-service="property"] .ws-detail .ws-select { background: var(--tenant-map-ink); color: var(--ui-surface); border-color: var(--tenant-map-ink); }
+.map-workspace[data-service="property"] .ws-list .ws-compare-toggle, .map-workspace[data-service="property"] .ws-detail .ws-compare-toggle { color: var(--tenant-map-ink); border-color: var(--tenant-map-line); background: var(--tenant-map-card); }
+.map-workspace[data-service="property"] .ws-detail-price { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.housing-detail-link { display: inline-flex; align-items: center; gap: 4px; border: 0; background: var(--ui-info-soft); color: var(--ui-info); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; }
+@media (max-width: 900px) { .account-preferences .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) {
+  .account-page .account-grid, .request-history-list { grid-template-columns: minmax(0, 1fr); }
+  .request-history-card:is(:nth-child(odd), :not(:nth-child(3n))) { border-right: 0; }
+  .account-preferences .form-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.viewing-panel { align-content: start; }
+.viewing-item > .form-actions:empty { display: none; }
+.viewing-item > .form-actions { margin-top: 0; padding-top: 8px; }
+.contact-thread-list li:has(.contact-thread-seen) { position: relative; margin-bottom: 18px; }
+.contact-thread-seen { position: absolute; right: 0; bottom: -18px; }
+.ws-list .ws-list-head :is(h2, .eyebrow) { color: var(--tenant-map-ink); }
+.plan-peek-footer:has(> .bulk-footer-mount:empty) { display: none; }
+
+/* Content and map controls start below the always-visible header. */
+.main-shell > .page-main { padding-top: var(--ui-header-height); }
+
+.field-label { display: inline-flex; align-items: baseline; gap: 4px; color: inherit; }
+.required-mark { color: var(--ui-danger); font-size: .85em; font-weight: 700; margin-inline-start: 4px; }
+.required-mark::after { content: "*"; }
+.housing-optional { border: 1px solid var(--ui-line); background: var(--ui-soft); border-radius: var(--radius-panel); padding: 16px; }
+.housing-optional h4 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin: 0 0 12px; font-size: 14px; }
+.housing-optional h4 > span { color: var(--ui-muted); font-size: 12px; font-weight: 400; }
+.housing-optional .form-grid { margin-top: 0; }
+@media (max-width: 767px) { .chat-header .chat-brand .chat-title { font-size: 18px; } }
+@media (max-width: 767px) {
+  /* An expanded chat reserves space instead of covering flight result actions. */
+  .svc-workspace .svc-main > .ws-dock {
+    position: static;
+    inset: auto;
+    transform: none;
+    width: calc(100% - 16px);
+    margin: 8px;
+    flex: 0 0 auto;
+  }
+  .svc-workspace .svc-main:has(> .ws-dock) > .svc-list { padding-bottom: 16px; }
+}
+
+@media (max-width: 767px) {
+  /* Quote workspaces use the filter bar directly; keep it in flow above the chat launcher. */
+  .moving-booking .ws-map > .ws-filterbar {
+    position: relative; inset: auto; width: calc(100% - 16px); margin: 8px; flex: 0 0 auto;
+  }
+  .moving-booking .ws-filterbar .ws-filter-label { display: inline-flex; }
+}
+
+/* Page backdrop from the tenant canvas: soft mint waves under translucent page wrappers.
+   Surfaces (cards, panels, dialogs) keep their own colors; only page-level wrappers clear. */
+:root[data-theme] body {
+  background: var(--ui-bg) url("./assets/page-backdrop.svg") center / cover no-repeat fixed;
+}
+:root[data-theme="dark"] body {
+  background-image: url("./assets/page-backdrop-dark.svg");
+}
+:root[data-theme] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--ui-surface) 45%, transparent);
+}
+/* The landlord workspace keeps its own shell background. */
+:root[data-theme] .app-shell:not(.host-shell),
+:root[data-theme] .app-shell:not(.host-shell) :is(.main-shell, .page-main, .chat-page, .composer-wrap, .service-journey) {
+  background: transparent;
+}
+
+/* Open plan: the page behind it dims and blurs (canvas). Clicks pass through to the
+   existing outside-click close; the plan tab stays above the veil. */
+.plan-peek-backdrop {
+  position: fixed; inset: 0; z-index: 75; pointer-events: none;
+  background: color-mix(in srgb, var(--ui-text) 38%, transparent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+:root[data-theme="dark"] .plan-peek-backdrop { background: rgb(0 0 0 / 0.45); }
+.plan-peek-tab { z-index: 81; }
+
+/* Account profile (canvas): personal info and security side by side at equal height,
+   flight booker across both columns with a three-column form. */
+.account-page .account-grid:not(.account-preferences) { align-items: stretch; }
+.account-page .account-grid > :is(.traveler-profile, .account-roommate-intro) { grid-column: 1 / -1; }
+.account-page .traveler-profile .form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.account-page .account-security { display: flex; flex-direction: column; }
+.account-page .account-security > .text-button.danger { margin-top: auto; align-self: flex-start; }
+@media (max-width: 767px) {
+  .account-page .traveler-profile .form-grid { grid-template-columns: minmax(0, 1fr); }
+}
+/* The plan container takes focus only to move screen readers into it; no ring around the panel. */
+.plan-peek-panel:focus { outline: none; }

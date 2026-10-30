@@ -1,0 +1,31 @@
+.git
+.gitignore
+.env
+.venv
+__pycache__
+*.pyc
+**/__pycache__
+**/*.pyc
+data/
+# Location source has moved; this tree contains persistent credentials/state
+# and large Cities/Raw/Extracts/Routing assets, never application build inputs.
+Maps VN/
+**/node_modules
+**/dist
+.pytest_cache
+.ruff_cache
+docs/
+presentation/
+eval/
+*.md
+!requirements.txt
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+**/build
+**/*.egg-info
+
+# Examples/static references and legacy local media do not belong in runtime images.
+examples/
+Frontend/

@@ -1,0 +1,172 @@
+[
+  {
+    "service": "web",
+    "context": ".",
+    "dockerfile": "apps/web/Dockerfile",
+    "target": "",
+    "paths": [
+      "apps/web/",
+      "config/",
+      "requirements.txt",
+      "package.json",
+      "package-lock.json",
+      "packages/python/",
+      "requirements-runtime.txt",
+      "apps/browser-gateway/",
+      "requirements-observability.txt"
+    ]
+  },
+  {
+    "service": "backend",
+    "context": ".",
+    "dockerfile": "Dockerfile",
+    "target": "",
+    "paths": [
+      "apps/agent-api/",
+      "config/",
+      "requirements.txt",
+      "packages/python/",
+      "requirements-runtime.txt",
+      "requirements-observability.txt"
+    ]
+  },
+  {
+    "service": "platform",
+    "context": ".",
+    "dockerfile": "apps/platform-api/Dockerfile",
+    "target": "platform",
+    "paths": [
+      "tsconfig.base.json",
+      "packages/contracts/",
+      "packages/housing-query/",
+      "apps/platform-api/",
+      "package.json",
+      "package-lock.json",
+      "scripts/docker-npm.mjs",
+      "packages/telemetry/"
+    ]
+  },
+  {
+    "service": "location",
+    "context": ".",
+    "dockerfile": "apps/location-mcp/Dockerfile",
+    "target": "",
+    "paths": [
+      "tsconfig.base.json",
+      "packages/contracts/",
+      "packages/housing-query/",
+      "apps/location-mcp/",
+      "packages/mcp-core/",
+      "package.json",
+      "package-lock.json",
+      "scripts/docker-npm.mjs",
+      "packages/telemetry/"
+    ]
+  },
+  {
+    "service": "location-migrate",
+    "context": ".",
+    "dockerfile": "apps/platform-api/Dockerfile",
+    "target": "location-migrate",
+    "paths": [
+      "tsconfig.base.json",
+      "packages/contracts/",
+      "packages/housing-query/",
+      "apps/platform-api/",
+      "deploy/database/migrations/",
+      "package.json",
+      "package-lock.json",
+      "scripts/docker-npm.mjs",
+      "packages/telemetry/"
+    ]
+  },
+  {
+    "service": "flights-mcp",
+    "context": ".",
+    "dockerfile": "apps/flights-mcp/Dockerfile",
+    "target": "",
+    "paths": [
+      "apps/flights-mcp/",
+      "packages/python/flight/",
+      "packages/python/mcp-http/",
+      "requirements-observability.txt"
+    ]
+  },
+  {
+    "service": "payments-mcp",
+    "context": ".",
+    "dockerfile": "apps/payments-mcp/Dockerfile",
+    "target": "",
+    "paths": [
+      "apps/payments-mcp/",
+      "packages/python/payment/",
+      "packages/python/mcp-http/",
+      "requirements-observability.txt"
+    ]
+  },
+  {
+    "service": "moving-api",
+    "context": ".",
+    "dockerfile": "deploy/moving/Dockerfile.moving",
+    "target": "moving-api",
+    "paths": [
+      "tsconfig.base.json",
+      "packages/contracts/",
+      "packages/mcp-core/",
+      "packages/moving-service/",
+      "apps/moving-api/",
+      "apps/moving-mcp/",
+      "package.json",
+      "package-lock.json",
+      "scripts/docker-npm.mjs",
+      "packages/telemetry/"
+    ]
+  },
+  {
+    "service": "moving-mcp",
+    "context": ".",
+    "dockerfile": "deploy/moving/Dockerfile.moving",
+    "target": "moving-mcp",
+    "paths": [
+      "tsconfig.base.json",
+      "packages/contracts/",
+      "packages/mcp-core/",
+      "packages/moving-service/",
+      "apps/moving-api/",
+      "apps/moving-mcp/",
+      "package.json",
+      "package-lock.json",
+      "scripts/docker-npm.mjs",
+      "packages/telemetry/"
+    ]
+  },
+  {
+    "service": "moving-migrate",
+    "context": ".",
+    "dockerfile": "deploy/moving/Dockerfile.moving",
+    "target": "moving-migrate",
+    "paths": [
+      "tsconfig.base.json",
+      "packages/contracts/",
+      "packages/mcp-core/",
+      "packages/moving-service/",
+      "apps/moving-api/",
+      "apps/moving-mcp/",
+      "deploy/database/moving/",
+      "deploy/database/migrations/008_moving_service.sql",
+      "package.json",
+      "package-lock.json",
+      "scripts/docker-npm.mjs",
+      "packages/telemetry/"
+    ]
+  },
+  {
+    "service": "provisioner",
+    "context": "deploy/provisioner",
+    "dockerfile": "deploy/provisioner/Dockerfile",
+    "target": "",
+    "paths": [
+      "deploy/provisioner/"
+    ]
+  }
+]

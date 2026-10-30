@@ -1,0 +1,46 @@
+name: MVP local validation
+on:
+  push:
+    branches: [mvp]
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    name: Validate local stack
+    runs-on: [self-hosted, linux, team-44]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Create job-local Python environment
+        run: bash scripts/setup-ci-python.sh
+      - name: Verify runner tools
+        run: bash scripts/check-ci-runner.sh python
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Lint local stack
+        run: ruff check examples/streamlit apps/agent-api apps/flights-mcp apps/payments-mcp packages/python tests scripts/local-integration.py scripts/init-local-integration.py scripts/restore-local-snapshot.py
+      - name: Check Python compilation
+        run: python -m compileall -q examples/streamlit/src apps/*/src/relohome_* packages/python/*/src
+      - name: Test SQLite persistence
+        run: pytest tests/test_llm_agents/test_runtime_storage.py -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Verify Node.js
+        run: bash scripts/check-ci-runner.sh node
+      - name: Build TypeScript workspaces
+        run: npm ci && npm run build
+      - name: Clean up Python environment
+        if: always()
+        run: if [ -n "${CI_PYTHON_VENV:-}" ]; then rm -rf "$CI_PYTHON_VENV"; fi

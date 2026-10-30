@@ -1,0 +1,27 @@
+{
+  "name": "@relohome/telemetry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./register": "./dist/register.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run tests"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@opentelemetry/instrumentation": "0.223.0",
+    "@fastify/otel": "0.21.2",
+    "@opentelemetry/instrumentation-http": "0.223.0",
+    "@opentelemetry/instrumentation-pg": "0.75.0",
+    "@opentelemetry/instrumentation-pino": "0.69.0",
+    "@opentelemetry/instrumentation-undici": "0.33.0",
+    "@opentelemetry/sdk-node": "0.223.0"
+  }
+}

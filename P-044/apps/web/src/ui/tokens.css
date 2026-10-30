@@ -1,0 +1,220 @@
+/* Canonical palette. Service identity and business status have separate roles. */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-control: 8px;
+  --radius-panel: 12px;
+  --radius-dialog: 16px;
+  --font-small: 12px;
+  --font-body: 14px;
+  --font-reading: 16px;
+  --control-height: 40px;
+  --ui-header-height: 72px;
+  --ui-bg: #f4f6fa;
+  --ui-surface: #ffffff;
+  --ui-surface-raised: #ffffff;
+  --ui-soft: #e6edf3;
+  --ui-section: #d2e5dc;
+  --ui-section-line: #aac6b8;
+  --ui-text: #152b28;
+  --ui-muted: #506662;
+  --ui-line: #d3e1db;
+  --ui-control-line: #778c85;
+  --ui-accent: #087653;
+  --ui-accent-strong: #066649;
+  --ui-accent-hover: #05583e;
+  --ui-accent-soft: #ddf5e9;
+  --ui-on-accent: #ffffff;
+  --ui-danger: #b42343;
+  --ui-danger-soft: #fff0f3;
+  --ui-warning: #865900;
+  --ui-warning-soft: #fff3d6;
+  --ui-success: #167047;
+  --ui-success-soft: #e0f5e8;
+  --ui-pending: #52647b;
+  --ui-pending-soft: #eaf0f8;
+  --ui-info: #255cb8;
+  --ui-info-soft: #e9f1ff;
+  --ui-shadow-color: #123e30;
+  --ui-overlay: #081f25b8;
+  --shadow-card: 0 2px 4px #123e3006, 0 8px 24px #123e3008;
+  --shadow-raised: 0 4px 12px #123e300a, 0 16px 36px #123e3012;
+  --shadow-overlay: 0 24px 72px #08251f30;
+  --focus-ring: #087653;
+  --service-home: #087653;
+  --service-home-soft: #ddf5e9;
+  --service-flight: #5742ba;
+  --service-flight-soft: #efebff;
+  --service-moving: #a44310;
+  --service-moving-soft: #fff0e5;
+  --service-route: #245fc3;
+  --service-route-soft: #e7f0ff;
+  --service-roommate: #b32b62;
+  --service-roommate-soft: #fce9f0;
+  --service-landlord: #8b5b0b;
+  --service-landlord-text: #78500b;
+  --service-landlord-soft: #fff1d5;
+  --service-guide: #087684;
+  --service-guide-soft: #ddf4f5;
+  --service-color: var(--service-home);
+  --service-soft: var(--service-home-soft);
+  /* Photo-safe cover palette stays consistent in both themes. */
+  --hero-bg: #10221e;
+  --hero-text: #f5fbf7;
+  --hero-muted: #e4eee9;
+  --hero-accent: #adf1cd;
+  --hero-accent-hover: #d1f9e2;
+  --hero-on-accent: #10261d;
+  --hero-overlay-start: #091a18ed;
+  --hero-overlay-mid: #091a18aa;
+  --hero-overlay-end: #091a1830;
+  --hero-overlay-floor: #091a1866;
+  --hero-mobile-start: #071714f2;
+  --hero-mobile-mid: #071714e7;
+  --hero-mobile-end: #07171470;
+  --hero-link-line: #ffffff8c;
+  --hero-clear: #091a1800;
+  --hero-shadow: #00000032;
+  --ui-qr-surface: #ffffff;
+  --map-preview-land: #e4ede4;
+  --map-preview-block: #d1e0d3;
+  --map-preview-road: #f6f4ee;
+  --map-preview-water: #bddddc;
+  --map-preview-radius: #3180650c;
+  --ai-shell-highlight: #ffffff;
+  --ai-shell: #ddf5e9;
+  --ai-shell-shade: #69a98d;
+  --blue: var(--service-route);
+  --violet: var(--service-flight);
+  --brand: var(--ui-accent);
+  --muted: var(--ui-muted);
+  --line: var(--ui-line);
+  --shadow: var(--shadow-card);
+  color: var(--ui-text);
+  background: var(--ui-bg);
+}
+:root[data-theme="dark"] {
+  --ui-bg: #0d1522;
+  --ui-surface: #151f2e;
+  --ui-surface-raised: #1b293a;
+  --ui-soft: #213044;
+  --ui-section: #203d35;
+  --ui-section-line: #426b5c;
+  --ui-text: #eff6f4;
+  --ui-muted: #adbfcb;
+  --ui-line: #35485d;
+  --ui-control-line: #70869b;
+  --ui-accent: #80e7be;
+  --ui-accent-strong: #65d9ab;
+  --ui-accent-hover: #98efce;
+  --ui-accent-soft: #173a32;
+  --ui-on-accent: #0a211c;
+  --ui-danger: #ffacbc;
+  --ui-danger-soft: #412633;
+  --ui-warning: #f3cf86;
+  --ui-warning-soft: #3d3321;
+  --ui-success: #86e0b5;
+  --ui-success-soft: #1c3b31;
+  --ui-pending: #bbcbdf;
+  --ui-pending-soft: #263448;
+  --ui-info: #a6c9ff;
+  --ui-info-soft: #1b3454;
+  --ui-shadow-color: #000000;
+  --ui-overlay: #030a14d9;
+  --shadow-card: 0 2px 8px #00000020;
+  --shadow-raised: 0 8px 28px #00000035;
+  --shadow-overlay: 0 24px 72px #00000070;
+  --focus-ring: #8bf0ca;
+  --service-home: #80e7be;
+  --service-home-soft: #173a32;
+  --service-flight: #c4b5ff;
+  --service-flight-soft: #302847;
+  --service-moving: #ffb47f;
+  --service-moving-soft: #422d23;
+  --service-route: #a5c7ff;
+  --service-route-soft: #203652;
+  --service-roommate: #ffb0cb;
+  --service-roommate-soft: #442a3b;
+  --service-landlord: #f5d38b;
+  --service-landlord-text: #f5d38b;
+  --service-landlord-soft: #3d3422;
+  --service-guide: #8be2e6;
+  --service-guide-soft: #1d3b42;
+  --ai-shell-highlight: #def8ee;
+  --ai-shell: #b2e0cd;
+  --ai-shell-shade: #6ca68e;
+  --map-preview-land: #243a33;
+  --map-preview-block: #355047;
+  --map-preview-road: #152b24;
+  --map-preview-water: #325859;
+  --map-preview-radius: #9ee4bd12;
+}
+[data-service="property"] { --service-color: var(--service-home); --service-soft: var(--service-home-soft); }
+[data-service="map"] { --service-color: var(--service-route); --service-soft: var(--service-route-soft); }
+[data-service="flight"] { --service-color: var(--service-flight); --service-soft: var(--service-flight-soft); }
+[data-service="relocation"] { --service-color: var(--service-moving); --service-soft: var(--service-moving-soft); }
+[data-service="roommate"] { --service-color: var(--service-roommate); --service-soft: var(--service-roommate-soft); }
+[data-service="landlord"] { --service-color: var(--service-landlord); --service-soft: var(--service-landlord-soft); }
+[data-service="guides"], [data-service="guide"] { --service-color: var(--service-guide); --service-soft: var(--service-guide-soft); }
+@media (max-width: 767px) { :root { --ui-header-height: 104px; --control-height: 44px; } }
+@media (pointer: coarse) { :root { --control-height: 44px; } }
+
+/* Tenant canvas: listing identity colors and separate cost/contact surfaces. */
+:root {
+  --tenant-home-purple: #f3eefc;
+  --tenant-home-purple-soft: #faf8fe;
+  --tenant-home-purple-ink: #5742ba;
+  --tenant-home-blue: #e6f1fc;
+  --tenant-home-blue-soft: #f7fafe;
+  --tenant-home-blue-ink: #245fc3;
+  --tenant-home-peach: #fff0e5;
+  --tenant-home-peach-soft: #fffaf4;
+  --tenant-home-peach-ink: #a44310;
+  --tenant-home-teal: #ddf4f5;
+  --tenant-home-teal-soft: #f6fcfc;
+  --tenant-home-teal-ink: #087684;
+  --tenant-cost-bg: #f2f9f5;
+  --tenant-contact-bg: #f1f6fe;
+  --tenant-contact-line: #c9dcf5;
+  --tenant-table-head: #087653;
+  --tenant-map-selected: #d3f2f1;
+  --tenant-map-bg: #ecf9f9d9;
+  --tenant-map-card: #f7fdfd;
+  --tenant-map-ink: #087684;
+  --tenant-map-line: #5cb8bc;
+  --tenant-warning-line: #e2b450;
+  --tenant-alert: #d92d20;
+  --tenant-glass: #ffffffb8;
+  --tenant-slot-bg: #066649;
+  --tenant-slot-text: #ffffff;
+}
+:root[data-theme="dark"] {
+  --tenant-home-purple: #302847;
+  --tenant-home-purple-soft: #252037;
+  --tenant-home-purple-ink: #c4b5ff;
+  --tenant-home-blue: #203652;
+  --tenant-home-blue-soft: #1a2b42;
+  --tenant-home-blue-ink: #a5c7ff;
+  --tenant-home-peach: #422d23;
+  --tenant-home-peach-soft: #32251f;
+  --tenant-home-peach-ink: #ffb47f;
+  --tenant-home-teal: #1d3b42;
+  --tenant-home-teal-soft: #172e35;
+  --tenant-home-teal-ink: #8be2e6;
+  --tenant-cost-bg: #172e28;
+  --tenant-contact-bg: #1b304a;
+  --tenant-contact-line: #48668f;
+  --tenant-map-selected: #224b4d;
+  --tenant-map-bg: #162e34;
+  --tenant-map-card: #1a333b;
+  --tenant-map-ink: #8be2e6;
+  --tenant-map-line: #559caa;
+  --tenant-warning-line: #a88741;
+  --tenant-alert: #ff8a80;
+  --tenant-glass: #151f2eb8;
+}

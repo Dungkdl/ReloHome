@@ -1,0 +1,2 @@
+# Backward-compatible developer setup. Images use requirements-runtime.txt.
+-r requirements-dev.txt
